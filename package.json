@@ -1,0 +1,56 @@
+{
+  "name": "vue-labelset-editor",
+  "version": "0.1.0",
+  "description": "A Vue component for creating and editing annotation label sets: labels, colours, order, relation labels, bulk entry and JSON import/export.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaastrichtU-BISS/vue-labelset-editor.git"
+  },
+  "homepage": "https://github.com/MaastrichtU-BISS/vue-labelset-editor#readme",
+  "keywords": [
+    "vue",
+    "labelset",
+    "labels",
+    "annotation",
+    "editor"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/vue-labelset-editor.umd.cjs",
+  "module": "./dist/vue-labelset-editor.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-labelset-editor.js",
+      "require": "./dist/vue-labelset-editor.umd.cjs"
+    },
+    "./model": {
+      "types": "./dist/model/index.d.ts",
+      "import": "./dist/model.js"
+    },
+    "./style.css": "./dist/vue-labelset-editor.css"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build && vite build --config vite.model.config.ts",
+    "test": "vitest run",
+    "prepublishOnly": "pnpm run test && pnpm run build"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/language-core": "^3.3.13",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5",
+    "vite-plugin-dts": "^5.1.2",
+    "vitest": "^3.2.7",
+    "vue": "^3.5.44",
+    "vue-tsc": "^2.2.12"
+  }
+}
