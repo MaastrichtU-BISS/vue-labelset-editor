@@ -40,24 +40,41 @@ const issues = computed(() =>
 );
 watch(issues, (value) => emit("issues", value), { immediate: true });
 
-const issueFor = (field: Issue["field"]) => issues.value.find((i) => i.field === field)?.message;
+// A field's problem shows once it has been edited, so a new labelset doesn't
+// open covered in errors. One that arrives with labels shows them at once.
+const touched = ref(new Set<Issue["field"]>());
+const revealAll = ref(labelset.value.labels.length > 0);
+const shown = (field: Issue["field"]) => revealAll.value || touched.value.has(field);
+const touch = (...fields: Issue["field"][]) => fields.forEach((f) => touched.value.add(f));
+
+/** Show every problem, e.g. when the host's save is pressed while some remain. */
+const revealIssues = () => (revealAll.value = true);
+defineExpose({ revealIssues });
+
+const issueFor = (field: Issue["field"]) =>
+  shown(field) ? issues.value.find((i) => i.field === field)?.message : undefined;
 const rowIssues = (field: Issue["field"]) =>
   Object.fromEntries(issues.value.filter((i) => i.field === field).map((i) => [i.index!, i.message]));
 
 const original = JSON.stringify(labelset.value);
 const changed = computed(() => JSON.stringify(labelset.value) !== original);
-const reset = () => (labelset.value = JSON.parse(original));
+const reset = () => {
+  labelset.value = JSON.parse(original);
+  touched.value.clear();
+};
 
 const update = (patch: Partial<Labelset>) => (labelset.value = { ...labelset.value, ...patch });
 const showBulk = ref(false);
 
-const importLabelset = (imported: Labelset) =>
+const importLabelset = (imported: Labelset) => {
+  revealIssues();
   update({
     name: imported.name || labelset.value.name,
     desc: imported.desc || labelset.value.desc,
     labels: imported.labels,
     ...(props.withRelationLabels ? { relation_labels: imported.relation_labels } : {}),
   });
+};
 </script>
 
 <template>
@@ -68,8 +85,8 @@ const importLabelset = (imported: Labelset) =>
       :name-problem="issueFor('name')"
       :desc-problem="issueFor('desc')"
       :require-description="requireDescription"
-      @update:name="(name) => update({ name })"
-      @update:desc="(desc) => update({ desc })"
+      @update:name="(name) => (touch('name'), update({ name }))"
+      @update:desc="(desc) => (touch('desc'), update({ desc }))"
     />
 
     <p v-if="locked" class="lse-notice" role="note">{{ lockedMessage }}</p>
@@ -91,7 +108,7 @@ const importLabelset = (imported: Labelset) =>
       <BulkAddPanel
         v-if="showBulk && !locked"
         :existing="labelset.labels"
-        @add="(labels) => update({ labels: [...labelset.labels, ...labels] })"
+        @add="(labels) => (touch('labels'), update({ labels: [...labelset.labels, ...labels] }))"
         @close="showBulk = false"
       />
       <LabelList
@@ -99,7 +116,7 @@ const importLabelset = (imported: Labelset) =>
         :problems="rowIssues('label')"
         :hotkey="hotkey"
         :locked="locked"
-        @update:labels="(labels) => update({ labels })"
+        @update:labels="(labels) => (touch('labels'), update({ labels }))"
       />
       <p v-if="issueFor('labels')" class="lse-problem">{{ issueFor("labels") }}</p>
     </section>

@@ -14,16 +14,17 @@ import { LabelsetEditor, isValidLabelset, type Labelset } from "vue-labelset-edi
 import "vue-labelset-editor/style.css";
 
 const labelset = ref<Labelset>({ name: "", desc: "", labels: [], relation_labels: null });
+const editor = ref<InstanceType<typeof LabelsetEditor>>();
 
 async function save() {
-  if (!isValidLabelset(labelset.value)) return;
+  if (!isValidLabelset(labelset.value)) return editor.value?.revealIssues();
   await fetch("/api/labelsets", { method: "POST", body: JSON.stringify(labelset.value) });
 }
 </script>
 
 <template>
-  <LabelsetEditor v-model="labelset" />
-  <button :disabled="!isValidLabelset(labelset)" @click="save">Save</button>
+  <LabelsetEditor ref="editor" v-model="labelset" />
+  <button @click="save">Save</button>
 </template>
 ```
 
@@ -54,12 +55,15 @@ them stores the list on the labelset, ready to pass to legal-annotation-kit's
 - Reordering by dragging, or with the arrow buttons. Each row shows the key that arms
   the label in legal-annotation-kit: 1–9, 0, then a–z.
 - **Paste a list**: one label per line, optionally followed by a colour
-  (`Obligation #d62728`). Lines that can't be added are shown with the reason.
+  (`Obligation #d62728`). Lines that can't be added are shown with the reason and
+  stay in the box to be fixed; when every line is added the panel closes.
 - **Import JSON** reads a file exported by this component, a whole
   legal-annotation-kit task file (its `labelset`), or a bare array of labels.
   **Export JSON** saves the labelset.
 - **Undo all changes** brings back the labelset as it was when the editor opened.
-- Problems are shown next to the field or row they concern, as you type.
+- Problems are shown next to the field or row they concern, once that field has been
+  edited, so a blank labelset doesn't open covered in errors. A labelset that arrives
+  with labels shows its problems straight away.
 
 ## Props
 
@@ -72,7 +76,11 @@ them stores the list on the labelset, ready to pass to legal-annotation-kit's
 | `requireDescription` | `true` | Whether an empty description counts as a problem. |
 | `hotkey` | 1–9, 0, a–z | `(index) => string`, the key shown per label. `null` hides the keys. |
 
-Events: `issues` with the current list of problems, every time it changes.
+Events: `issues` with the current list of problems, every time it changes, including
+problems not shown yet.
+
+Methods (through a template ref): `revealIssues()` shows every problem, for when Save
+is pressed while some remain.
 
 ## Rules
 

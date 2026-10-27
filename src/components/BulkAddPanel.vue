@@ -19,7 +19,11 @@ const add = () => {
     return { name: line.name, color };
   });
   emit("add", labels);
-  text.value = "";
+  // Lines that were skipped stay behind so they can be fixed and added.
+  const skipped = lines.value.filter((l) => l.problem);
+  if (!skipped.length) return emit("close");
+  const raw = text.value.split(/\r?\n/);
+  text.value = skipped.map((l) => raw[l.line - 1]).join("\n");
 };
 </script>
 
