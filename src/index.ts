@@ -1,2 +1,2 @@
 export { default as LabelsetEditor } from "./components/LabelsetEditor.vue";
-export * from "./model";
+export * from "./model/index";
