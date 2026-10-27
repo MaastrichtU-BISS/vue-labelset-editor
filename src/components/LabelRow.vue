@@ -35,6 +35,7 @@ const emit = defineEmits<{
       class="lse-row__handle"
       draggable="true"
       title="Drag to reorder"
+      data-test="reorder"
       aria-hidden="true"
       @dragstart="emit('dragstart', $event)"
       @dragend="emit('dragend')"
@@ -56,12 +57,13 @@ const emit = defineEmits<{
       :aria-label="`Label ${index + 1} name`"
       :aria-invalid="!!problem"
       :style="{ '--lse-label-color': label.color }"
+      data-test="label"
       @input="emit('update', { ...label, name: ($event.target as HTMLInputElement).value })"
     />
     <span class="lse-row__actions">
       <button type="button" class="lse-icon" :disabled="index === 0" title="Move up" @click="emit('move', index - 1)">↑</button>
       <button type="button" class="lse-icon" :disabled="index === count - 1" title="Move down" @click="emit('move', index + 1)">↓</button>
-      <button v-if="!locked" type="button" class="lse-icon lse-icon--danger" title="Remove label" @click="emit('remove')">✕</button>
+      <button v-if="!locked" type="button" class="lse-icon lse-icon--danger" title="Remove label" data-test="delete-label" @click="emit('remove')">✕</button>
     </span>
     <p v-if="problem" class="lse-problem lse-row__problem">{{ problem }}</p>
   </li>

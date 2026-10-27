@@ -40,10 +40,11 @@ const submit = () => {
       class="lse-input lse-add__name"
       placeholder="New label name"
       aria-label="New label name"
+      data-test="label-name"
       :aria-invalid="touched && !!problem"
       @input="touched = false"
     />
-    <button type="submit" class="lse-button">Add label</button>
+    <button type="submit" class="lse-button" data-test="add-label">Add label</button>
     <p v-if="touched && problem" class="lse-problem lse-add__problem">{{ problem }}</p>
   </form>
 </template>

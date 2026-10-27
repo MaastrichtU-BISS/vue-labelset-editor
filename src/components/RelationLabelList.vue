@@ -58,6 +58,7 @@ const add = () => {
             :value="name"
             :readonly="locked"
             :aria-label="`Relation label ${i + 1}`"
+            data-test="relation-label"
             :aria-invalid="!!problems[i]"
             @input="set(shown.map((n, j) => (j === i ? ($event.target as HTMLInputElement).value : n)))"
           />
@@ -75,9 +76,10 @@ const add = () => {
           class="lse-input lse-add__name"
           placeholder="New relation label"
           aria-label="New relation label"
+          data-test="relation-label-name"
           @input="touched = false"
         />
-        <button type="submit" class="lse-button">Add</button>
+        <button type="submit" class="lse-button" data-test="add-relation-label">Add</button>
         <p v-if="touched && newProblem" class="lse-problem lse-add__problem">{{ newProblem }}</p>
       </form>
     </template>
